@@ -23,10 +23,6 @@
 
 ### 步骤 1：准备环境（Ubuntu/CentOS 示例）
 
-bash
-
-编辑
-
 ```
 # 安装 Docker 和 Docker Compose
 curl -fsSL https://get.docker.com | sh
@@ -36,20 +32,12 @@ newgrp docker
 
 ### 步骤 2：创建目录结构
 
-bash
-
-编辑
-
 ```
 mkdir -p ~/headscale/{config,data}
 cd ~/headscale
 ```
 
 ### 步骤 3：创建 `docker-compose.yml`
-
-yaml
-
-编辑
 
 ```
 # ~/headscale/docker-compose.yml
@@ -68,10 +56,6 @@ services:
 
 ### 步骤 4：初始化配置文件
 
-bash
-
-编辑
-
 ```
 # 首次运行以生成 config.yaml
 docker compose up -d
@@ -82,10 +66,6 @@ nano config/config.yaml
 ```
 
 ### 步骤 5：配置 `config/config.yaml`
-
-yaml
-
-编辑
 
 ```
 # config/config.yaml
