@@ -69,7 +69,7 @@ nano config/config.yaml
 
 ```
 # config/config.yaml
-ephemeral_node_inactivity_timeout: 30m
+ephemeral_nodes_inactivity_timeout: 30m
 server_url: https://headscale.aitaking.com
 listen_addr: "[::]:8080"
 metrics_listen_addr: "[::]:9090"
