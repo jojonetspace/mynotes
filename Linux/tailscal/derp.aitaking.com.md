@@ -69,6 +69,7 @@ nano config/config.yaml
 
 ```
 # config/config.yaml
+ephemeral_node_inactivity_timeout: 30m
 server_url: https://headscale.aitaking.com
 listen_addr: "[::]:8080"
 metrics_listen_addr: "[::]:9090"
@@ -98,7 +99,6 @@ ip_prefixes:
   - "100.64.0.0/10"
   - "fd7a:115c:a1e0::/48"
 ```
-
 ### 步骤 6：添加 Caddy（自动 HTTPS）
 
 ```
