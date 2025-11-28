@@ -101,10 +101,6 @@ ip_prefixes:
 
 ### 步骤 6：添加 Caddy（自动 HTTPS）
 
-yaml
-
-编辑
-
 ```
 # 在 docker-compose.yml 中追加 caddy 服务
   caddy:
