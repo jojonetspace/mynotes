@@ -101,13 +101,65 @@ apt update && apt install -y git golang
 2. 克隆源码并构建
 
 ```
-cd /tmp
-git clone https://github.com/tailscale/tailscale.git
-cd tailscale
-
-# 构建 derper
-go build -o derper ./cmd/derper
+# 获取最新 release tag（如 v1.70.0）
+LATEST_TAG=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+echo "Latest release: $LATEST_TAG"
 ```
+```
+cd /tmp
+git clone --depth=1 --branch "$LATEST_TAG" https://github.com/tailscale/tailscale.git
+cd tailscale
+```
+
+```
+go version
+```
+如果你的系统 Go 版本太低（如 Ubuntu 22.04 默认是 1.18），请先升级：
+
+```
+# 下载 Go 1.23（当前最新稳定版）
+wget https://go.dev/dl/go1.23.4.linux-arm64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.23.4.linux-arm64.tar.gz
+
+# 添加到 PATH（临时）
+export PATH=$PATH:/usr/local/go/bin
+
+# 或永久写入 ~/.bashrc
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+```
+
+3. 创建 Dockerfile
+
+```
+cat > /root/derp-server/Dockerfile <<'EOF'
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates
+WORKDIR /app
+COPY derper /app/
+COPY certs/ /certs/
+EXPOSE 33445
+CMD ["./derper", \
+  "--hostname=derp.aitaking.com", \
+  "--stun", \
+  "--http-port=33445", \
+  "--tls-cert-path=/certs/fullchain.pem", \
+  "--tls-key-path=/certs/privkey.pem", \
+  "--a=0.0.0.0"]
+EOF
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
