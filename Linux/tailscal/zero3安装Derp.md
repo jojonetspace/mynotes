@@ -97,20 +97,6 @@ docker-compose up -d
 ```
 apt update && apt install -y git golang
 ```
-
-2. 克隆源码并构建
-
-```
-# 获取最新 release tag（如 v1.70.0）
-LATEST_TAG=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
-echo "Latest release: $LATEST_TAG"
-```
-```
-cd /tmp
-git clone --depth=1 --branch "$LATEST_TAG" https://github.com/tailscale/tailscale.git
-cd tailscale
-```
-
 ```
 go version
 ```
@@ -130,16 +116,46 @@ echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-3. 创建 Dockerfile
+### 下载官方 release 源码（非 main 分支！）
 
 ```
-cat > /root/derp-server/Dockerfile <<'EOF'
+cd /tmp
+LATEST_TAG=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+git clone --depth=1 --branch "$LATEST_TAG" https://github.com/tailscale/tailscale.git
+cd tailscale
+```
+
+### 构建 `derper` 二进制（用于放入镜像）
+
+```
+# 构建 Linux ARM64 版本
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o derper ./cmd/derper
+```
+
+验证：
+```
+file derper
+# 应显示: ELF 64-bit LSB executable, ARM aarch64
+```
+
+### 准备 Docker 构建目录
+
+```
+mkdir -p /root/derp-server/build
+cp derper /root/derp-server/build/
+cp -r /root/derp-server/certs /root/derp-server/build/
+```
+
+### 创建 `Dockerfile`
+```
+cat > /root/derp-server/build/Dockerfile <<'EOF'
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
 COPY derper /app/
 COPY certs/ /certs/
 EXPOSE 33445
+USER nobody
 CMD ["./derper", \
   "--hostname=derp.aitaking.com", \
   "--stun", \
@@ -150,20 +166,53 @@ CMD ["./derper", \
 EOF
 ```
 
+### 构建 Docker 镜像
+
+```
+cd /root/derp-server/build
+docker build -t my-derper:latest .
+```
+
+成功后你会看到：
+
+```
+Successfully built xxxxxxxx
+Successfully tagged my-derper:latest
+```
+### 修改 `docker-compose.yml`
 
 
+现在你可以用自建镜像了：
 
+```
+# /root/derp-server/docker-compose.yml
+version: '3.8'
+services:
+  derper:
+    image: my-derper:latest    # ← 使用本地镜像
+    container_name: derper
+    restart: unless-stopped
+    network_mode: host
+    # 不需要 volumes，因为证书已打包进镜像
+```
 
+💡 由于证书已 COPY 进镜像，**无需挂载 volumes**（更安全，避免权限问题）。
 
+### 启动服务
 
+```
+cd /root/derp-server
+docker-compose up -d
+```
+查看日志：
 
-
-
-
-
-
-
-
-
+```
+docker logs derper
+```
+应看到：
+```
+listening on :33445
+STUN server listening on :3478
+```
 
 
