@@ -89,3 +89,29 @@ docker-compose up -d
 - 如果你以后换服务器，只需重新运行 `acme.sh --issue` 即可。
 - 阿里云 AccessKey 建议只给 DNS 权限，用完可禁用。
 - 证书文件路径固定，DERP 无需重启（但建议重启以加载新证书，可通过 cron 实现）。
+
+
+### 方案二：自己构建 Docker 镜像（如果你坚持用 Docker）
+
+1. 安装 Go（≥1.21）和 Git
+```
+apt update && apt install -y git golang
+```
+
+2. 克隆源码并构建
+
+```
+cd /tmp
+git clone https://github.com/tailscale/tailscale.git
+cd tailscale
+
+# 构建 derper
+go build -o derper ./cmd/derper
+```
+
+
+
+
+
+
+
