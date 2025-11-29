@@ -148,3 +148,59 @@ systemctl enable --now derper
 journalctl -u derper -f
 ```
 
+### 🔧 终极修复步骤（已验证）
+
+```
+# 1. 删除错误的二进制
+rm -f /root/derp-server/derper ~/go/bin/derper
+
+# 2. 下载官方源码（v1.90.9）
+cd /tmp
+rm -rf tailscale-derp
+git clone --depth=1 --branch v1.90.9 https://github.com/tailscale/tailscale.git tailscale-derp
+cd tailscale-derp
+
+# 3. 明确构建 derper 子命令（关键！）
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o /root/derp-server/derper ./cmd/derper
+
+# 4. 验证是否真的是 derper
+if ! /root/derp-server/derper --help 2>&1 | grep -q "Usage of derper"; then
+  echo "❌ 构建失败！输出的不是 derper。"
+  exit 1
+fi
+
+# 5. 检查是否包含非法参数（确认干净）
+if /root/derp-server/derper --help 2>&1 | grep -q "verify-clients"; then
+  echo "❌ 仍然包含 tailscaled 参数！构建错误。"
+  exit 1
+fi
+
+echo "✅ 真正的 derper 已构建成功！"
+
+# 6. 配置 systemd（使用 --addr）
+cat > /etc/systemd/system/derper.service <<'EOF'
+[Unit]
+Description=DERP Server for Tailscale
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/derp-server
+ExecStart=/root/derp-server/derper \
+  --hostname=derp.aitaking.com \
+  --stun \
+  --addr=:33445 \
+  --tls-cert-path=/root/derp-server/certs/fullchain.pem \
+  --tls-key-path=/root/derp-server/certs/privkey.pem
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 7. 启动
+systemctl daemon-reexec
+systemctl restart derper
+journalctl -u derper -f
+```
