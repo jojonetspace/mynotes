@@ -87,56 +87,35 @@ go version #必须显示go1.23.4
 ###  一步到位脚本（复制粘贴即可）
 
 ```
-# 如果你已经保存了 install-derper.sh
-dos2unix install-derper.sh    # 安装 dos2unix（如未安装）
-# 或手动替换：
-sed -i 's/\r$//' install-derper.sh
+# 1. 确保使用兼容的 Go（1.22 或 1.23）
+# 如果你已有 Go 1.25.4，也可以，但建议用稳定版 Go 1.22.5 + v1.90.9
 
-# 然后再运行
-chmod +x install-derper.sh
-./install-derper.sh
-```
+# 2. 直接安装 derper（指定 release 版本）
+go install tailscale.com/cmd/derper@v1.90.9
 
-```
-#!/bin/bash
-set -euo pipefail
-
-echo "🚀 开始安装 Tailscale DERP 服务器（v1.90.9）..."
-
-# === 检查证书是否存在 ===
-if [ ! -f /root/derp-server/certs/fullchain.pem ] || [ ! -f /root/derp-server/certs/privkey.pem ]; then
-  echo "❌ 错误：证书文件缺失！"
-  echo "请确保以下文件存在："
-  echo "  /root/derp-server/certs/fullchain.pem"
-  echo "  /root/derp-server/certs/privkey.pem"
-  exit 1
-fi
-
-# === 确保 Go 在 PATH 中 ===
-export PATH="/usr/local/go/bin:$PATH"
-if ! command -v go >/dev/null 2>&1; then
-  echo "❌ 错误：Go 未安装或不在 PATH 中"
-  echo "请先安装 Go 1.21+（推荐 1.23.4）"
-  exit 1
-fi
-
-# === 创建工作目录 ===
+# 3. 二进制默认在 ~/go/bin/derper
 mkdir -p /root/derp-server
-cd /root/derp-server
-
-# === 下载源码并构建 derper ===
-echo "📥 下载 Tailscale v1.90.9 源码..."
-rm -rf /tmp/tailscale-derp-build
-git clone --depth=1 --branch v1.90.9 https://github.com/tailscale/tailscale.git /tmp/tailscale-derp-build
-
-echo "🔨 构建 derper (ARM64)..."
-cd /tmp/tailscale-derp-build
-GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o /root/derp-server/derper ./cmd/derper
-
-# === 设置权限 ===
+cp ~/go/bin/derper /root/derp-server/
 chmod +x /root/derp-server/derper
+```
 
-# === 创建 systemd 服务（无废弃参数）===
+###  验证是否成功
+
+```
+/root/derp-server/derper --help | head -n 5
+```
+
+✅ 应看到：
+
+```
+Usage of derper:
+  -a string
+        ...
+```
+
+### 📝 创建 systemd 服务（最终版）
+
+```
 cat > /etc/systemd/system/derper.service <<'EOF'
 [Unit]
 Description=DERP Server for Tailscale
@@ -148,7 +127,7 @@ WorkingDirectory=/root/derp-server
 ExecStart=/root/derp-server/derper \
   --hostname=derp.aitaking.com \
   --stun \
-  --http-port=33445 \
+  --addr=:33445 \
   --tls-cert-path=/root/derp-server/certs/fullchain.pem \
   --tls-key-path=/root/derp-server/certs/privkey.pem
 Restart=always
@@ -159,31 +138,13 @@ StandardError=journal
 [Install]
 WantedBy=multi-user.target
 EOF
+```
 
-# === 启动服务 ===
-echo "🔄 启动 derper 服务..."
+### 启动服务
+
+```
 systemctl daemon-reexec
-systemctl stop derper 2>/dev/null || true
 systemctl enable --now derper
-
-echo ""
-echo "✅ DERP 服务器已启动！"
-echo "📄 查看日志: journalctl -u derper -f"
-echo "🔍 成功标志: 'listening on :33445' 和 'STUN server listening on :3478'"
-echo "🌐 确保防火墙开放 TCP 33445 和 UDP 3478"
+journalctl -u derper -f
 ```
-
-## ✅ 成功后你会看到：
-
-```
-listening on :33445
-STUN server listening on :3478
-```
-
-
-
-
-
-
-
 
