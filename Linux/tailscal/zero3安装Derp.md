@@ -1,3 +1,4 @@
+## 🧹 第一步：安装证书
 ## 步骤一：安装 `acme.sh`
 
 ```
@@ -55,164 +56,220 @@ ls -l /root/derp-server/certs/
 ```
 ~/.acme.sh/acme.sh --renew -d aitaking.com --force
 ```
-## 步骤七：启动 DERP（和之前一样）
-
-docker-compose.yml
-如果不能拉取到镜像，可以参考下面的自编译创建Dockerfile
-
-```
-version: '3'
-services:
-  derper:
-    image: tailscale/derper:latest
-    container_name: derper
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - ./certs:/certs:ro
-    command:
-      - "--hostname=derp.aitaking.com"
-      - "--stun"
-      - "--http-port=33445"
-      - "--tls-cert-path=/certs/fullchain.pem"
-      - "--tls-key-path=/certs/privkey.pem"
-      - "--a=0.0.0.0"
-```
-
-启动：
-```
-cd ~/derp-server
-docker-compose up -d
-```
-## 小贴士
-
-- 如果你以后换服务器，只需重新运行 `acme.sh --issue` 即可。
-- 阿里云 AccessKey 建议只给 DNS 权限，用完可禁用。
-- 证书文件路径固定，DERP 无需重启（但建议重启以加载新证书，可通过 cron 实现）。
 
 
-### 方案二：自己构建 Docker 镜像（如果你坚持用 Docker）
+## ✅ 第二步：完整部署流程（宿主机 + systemd）
 
-1. 安装 Go（≥1.21）和 Git
-```
-apt update && apt install -y git golang
-```
-```
-go version
-```
-如果你的系统 Go 版本太低（如 Ubuntu 22.04 默认是 1.18），请先升级：
+
+### 1. 确保证书已正确安装
+
+你之前已用 `acme.sh` 安装证书到：
 
 ```
-# 下载 Go 1.23（当前最新稳定版）
-wget https://go.dev/dl/go1.23.4.linux-arm64.tar.gz
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf go1.23.4.linux-arm64.tar.gz
-
-# 添加到 PATH（临时）
-export PATH=$PATH:/usr/local/go/bin
-
-# 或永久写入 ~/.bashrc
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### 下载官方 release 源码（非 main 分支！）
-
-```
-cd /tmp
-LATEST_TAG=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
-git clone --depth=1 --branch "$LATEST_TAG" https://github.com/tailscale/tailscale.git
-cd tailscale
-```
-
-### 构建 `derper` 二进制（用于放入镜像）
-
-```
-# 构建 Linux ARM64 版本
-GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o derper ./cmd/derper
+/root/derp-server/certs/fullchain.pem
+/root/derp-server/certs/privkey.pem
 ```
 
 验证：
-```
-file derper
-# 应显示: ELF 64-bit LSB executable, ARM aarch64
-```
-
-### 准备 Docker 构建目录
 
 ```
-mkdir -p /root/derp-server/build
-cp derper /root/derp-server/build/
-cp -r /root/derp-server/certs /root/derp-server/build/
+ls -l /root/derp-server/certs/
+openssl x509 -in /root/derp-server/certs/fullchain.pem -noout -subject
+# 应输出: subject=CN = *.aitaking.com
 ```
 
-### 创建 `Dockerfile`
-```
-cat > /root/derp-server/build/Dockerfile <<'EOF'
-FROM alpine:latest
-RUN apk add --no-cache ca-certificates tzdata
-WORKDIR /app
-COPY derper /app/
-COPY certs/ /certs/
-EXPOSE 33445
-USER nobody
-CMD ["./derper", \
-  "--hostname=derp.aitaking.com", \
-  "--stun", \
-  "--http-port=33445", \
-  "--tls-cert-path=/certs/fullchain.pem", \
-  "--tls-key-path=/certs/privkey.pem", \
-  "--a=0.0.0.0"]
-EOF
-```
+---
 
-### 构建 Docker 镜像
-
-```
-cd /root/derp-server/build
-docker build -t my-derper:latest .
-```
-
-成功后你会看到：
-
-```
-Successfully built xxxxxxxx
-Successfully tagged my-derper:latest
-```
-### 修改 `docker-compose.yml`
-
-
-现在你可以用自建镜像了：
-
-```
-# /root/derp-server/docker-compose.yml
-version: '3.8'
-services:
-  derper:
-    image: my-derper:latest    # ← 使用本地镜像
-    container_name: derper
-    restart: unless-stopped
-    network_mode: host
-    # 不需要 volumes，因为证书已打包进镜像
-```
-
-💡 由于证书已 COPY 进镜像，**无需挂载 volumes**（更安全，避免权限问题）。
-
-### 启动服务
+### 2. 下载官方预编译 `derper` 二进制（ARM64）
 
 ```
 cd /root/derp-server
-docker-compose up -d
+
+# 获取最新版本号
+VERSION=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+echo "Installing Tailscale DERP version: $VERSION"
+
+# 下载 ARM64 版本（Orange Pi Zero 3 是 arm64/aarch64）
+wget -O derper.tgz "https://github.com/tailscale/tailscale/releases/download/${VERSION}/derper_${VERSION#v}_linux_arm64.tgz"
+
+# 解压（会生成 ./derper）
+tar -xzf derper.tgz
+
+# 验证
+./derper --help
 ```
-查看日志：
+
+> ✅ 不需要 Go，不需要编译！
+
+---
+
+### 3. 创建 systemd 服务（开机自启 + 自动重启）
 
 ```
-docker logs derper
+cat > /etc/systemd/system/derper.service <<EOF
+[Unit]
+Description=DERP Server for Tailscale
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/derp-server
+ExecStart=/root/derp-server/derper \\
+  --hostname=derp.aitaking.com \\
+  --stun \\
+  --http-port=33445 \\
+  --tls-cert-path=/root/derp-server/certs/fullchain.pem \\
+  --tls-key-path=/root/derp-server/certs/privkey.pem \\
+  --a=0.0.0.0
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
-应看到：
+
+> 🔒 参数说明：
+> 
+> - `--hostname=derp.aitaking.com`：必须匹配证书中的域名（`*.aitaking.com` 覆盖它）
+> - `--http-port=33445`：实际是 HTTPS 端口（可自定义）
+> - `--stun`：启用 STUN 服务（UDP 3478）
+> - `--a=0.0.0.0`：允许所有源 IP 连接（生产环境可用）
+
+---
+
+### 4. 启动服务
+
+```
+# 重载 systemd 配置
+systemctl daemon-reexec
+
+# 启用开机自启 + 立即启动
+systemctl enable --now derper
+
+# 查看实时日志
+journalctl -u derper -f
+```
+
+✅ 成功标志（日志中出现）：
+
 ```
 listening on :33445
 STUN server listening on :3478
 ```
+
+---
+
+### 5. 开放防火墙端口
+
+```
+# 如果使用 ufw
+ufw allow 33445/tcp   # DERP (HTTPS/WSS)
+ufw allow 3478/udp    # STUN
+
+# 如果使用 iptables 或云服务器安全组，请确保开放：
+# TCP 33445
+# UDP 3478
+```
+
+---
+
+### 6. 验证外部可访问性（可选）
+
+从另一台机器测试：
+
+```
+# 测试 TCP 端口
+telnet derp.aitaking.com 33445
+
+# 或用 openssl 测试 TLS
+openssl s_client -connect derp.aitaking.com:33445 -servername derp.aitaking.com
+```
+
+应能成功建立 TLS 连接。
+
+---
+
+## 🔄 证书自动续期（已配置好！）
+
+你之前用 `acme.sh --install-cert` 安装证书时，**`acme.sh` 已自动设置 cron 任务**，每 60 天续期一次，并自动更新：
+
+```
+/root/derp-server/certs/fullchain.pem
+/root/derp-server/certs/privkey.pem
+```
+
+但 `derper` **不会自动加载新证书**，所以需要**重启服务**。
+
+### 添加自动重启脚本（推荐）
+
+```
+# 创建续期后钩子
+cat > ~/.acme.sh/aitaking.com_ecc/renew-hook.sh <<'EOF'
+#!/bin/bash
+systemctl restart derper
+logger "DERP service restarted after certificate renewal"
+EOF
+
+chmod +x ~/.acme.sh/aitaking.com_ecc/renew-hook.sh
+```
+
+然后编辑 `acme.sh` 的 cron 任务：
+
+
+```
+crontab -e
+```
+
+找到类似这行：
+
+```
+0 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
+```
+
+**改成**：
+
+```
+0 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" --renew-hook "/root/.acme.sh/aitaking.com_ecc/renew-hook.sh" > /dev/null
+```
+
+> ✅ 这样每次证书更新后，`derper` 会自动重启加载新证书。
+
+---
+
+## 📌 最终目录结构
+
+```
+/root/derp-server/
+├── derper                     # 二进制程序
+├── certs/
+│   ├── fullchain.pem          # 证书（含中间 CA）
+│   └── privkey.pem            # 私钥
+└── (无 docker-compose.yml)
+```
+
+---
+
+## ✅ 总结：你现在拥有的是一个
+
+- **轻量级**：仅一个二进制 + 证书
+- **自动续期**：`acme.sh` + 钩子脚本
+- **开机自启**：systemd 管理
+- **安全可靠**：官方原生 `derper`，ARM64 优化
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
