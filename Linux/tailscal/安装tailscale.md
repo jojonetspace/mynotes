@@ -301,6 +301,8 @@ echo "补充配置完成！"
 
 这个完善的脚本已经包含了所有必要的配置步骤，运行一次即可完成 Tailscale 的安装、配置和防火墙规则设置。
 
+sudo tailscale up --accept-routes=true --advertise-routes=10.201.0.0/16,192.168.20.0/24,192.168.48.0/24,192.168.6.0/24,192.168.38.0/24 --advertise-exit-node --reset
+
 
 ![[Pasted image 20260328141422.png]]
 
