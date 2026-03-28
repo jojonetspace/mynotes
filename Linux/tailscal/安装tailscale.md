@@ -309,3 +309,15 @@ sudo tailscale up --accept-routes=true --advertise-routes=10.201.0.0/16,192.168.
 公司网络有两个设备，一个windows的lizh-tb16，一个unbuntu的op-jst都安装了tailscale。家里有一个同样是unbuntu的orangepizero3安装了tailscale,家里的路由器配置了静态路由见图。我还在阿里云安装了一个dep的服务用以家庭和公司的组网。
 derp服务check地址：https://8.153.165.65:33445/
 ![[Pasted image 20260328140420.png]]
+sudo nano /etc/systemd/system/derp.service
+[Unit]
+Description=TS Derper
+After=network.target
+Wants=network.target
+[Service]
+User=root
+Restart=always
+ExecStart=/etc/derp/derper -hostname derp.myself.com -a :33445 -http-port 33446 -certmode manual -certdir /etc/derp --verify-clients
+RestartPreventExitStatus=1
+[Install]
+WantedBy=multi-user.target
