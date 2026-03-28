@@ -300,3 +300,9 @@ echo "补充配置完成！"
 ```
 
 这个完善的脚本已经包含了所有必要的配置步骤，运行一次即可完成 Tailscale 的安装、配置和防火墙规则设置。
+
+
+
+公司网络有两个设备，一个windows的lizh-tb16，一个unbuntu的op-jst都安装了tailscale。家里有一个同样是unbuntu的orangepizero3安装了tailscale,家里的路由器配置了静态路由见图。我还在阿里云安装了一个dep的服务用以家庭和公司的组网。
+derp服务check地址：https://8.153.165.65:33445/
+![[Pasted image 20260328140420.png]]
