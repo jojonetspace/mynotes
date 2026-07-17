@@ -1,0 +1,1 @@
+* | select count(1) as t,status,url where status >= 300  group by status,url having count(1) > 100  order by status,count(1) desc  limit  10000 
