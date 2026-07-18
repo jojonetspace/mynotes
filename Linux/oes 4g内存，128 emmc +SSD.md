@@ -11,3 +11,8 @@ https://github.com/ophub/amlogic-s9xxx-armbian/releases/download/Armbian_bookwor
 - 默认 DHCP 获取 IP
 - SSH 端口 22
 - 用户 `root`，密码 `1234`（首次登录要改密码）
+
+
+oes:http://192.168.5.127
+casaos:http://192.168.5.127:8080
+jellyfin:http://192.168.5.127:8096
