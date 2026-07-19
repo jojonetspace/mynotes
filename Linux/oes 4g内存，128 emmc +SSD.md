@@ -14,6 +14,7 @@ https://github.com/ophub/amlogic-s9xxx-armbian/releases/download/Armbian_bookwor
 
 
 oes:http://192.168.5.127
+alsit:http://oes:5244
 casaos:http://192.168.5.127:8080
 jellyfin:http://192.168.5.127:8096
 Immich:http://192.168.5.127:2283
