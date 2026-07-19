@@ -17,8 +17,9 @@ oes:http://192.168.5.127
 alsit:http://oes:5244
 casaos:http://192.168.5.3:8080
 jellyfin:http://192.168.5.3:8096
-Immich:http://192.168.5.3:2283
 qinglong:http://192.168.5.3:5700/
+Immich:http://192.168.5.3:2283
+
 apikey:WN2CyQsX54sdHYDV8AV7FmH43ajl75LnC1B2ljkXfT0
 当前 Immich 的 PostgreSQL 和 Redis 是专用容器，在 Docker 的 `immich_default` 网络内部运行，只有同网络的容器才能访问。
 
