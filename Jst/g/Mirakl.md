@@ -1,3 +1,12 @@
+https://developer.mirakl.com/content/product/connect/rest/connect/openapi3/catalog/upsertproducts
+https://jsterpglobal.sg.larksuite.com/docx/PXVVddH14opprxxU4kElQadjggb
+
+Portal: [https://centralgroup-production.mirakl.net/login](https://centralgroup-production.mirakl.net/login)
+
+User: kckittipongch@gmail.com
+
+Pass: iloveCOL183*
+
 1
 ![[92fac10a2b327149b28a02512e685ce8.png]]
 2
