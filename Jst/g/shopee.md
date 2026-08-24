@@ -6,6 +6,7 @@
 
 bug?
 ![](https://static.dingtalk.com/media/lQLPKeZaZ2gBpNvNA3HNByawtJeocSbYnk0KXmo6fFCIAA_1830_881.png)
+![[1787566557042_311fb68019572142d067fc0679b39645.png]]
 
   
 折扣活动内没有搜索框，**没有折扣力度提醒**
