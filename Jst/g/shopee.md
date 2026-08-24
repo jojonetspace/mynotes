@@ -1,7 +1,13 @@
 试用账号，49666568344
 
-折扣活动不可修改结束时间和开启自动延续
+折扣活动不可修改结束时间和开启自动延续？？
 
+商家：试用账号；这个问题你查一下
+
+bug?
+![](https://static.dingtalk.com/media/lQLPKeZaZ2gBpNvNA3HNByawtJeocSbYnk0KXmo6fFCIAA_1830_881.png)
+
+  
 折扣活动内没有搜索框，**没有折扣力度提醒**
 ![[ead11f50f24652858c55606de1c2e268.png]]
 ![[f847ddd885e7fa0bd7b96f1d0cb43b63.png]]
