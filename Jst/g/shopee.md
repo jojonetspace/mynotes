@@ -6,6 +6,8 @@ shopee平台：366676850
 商家：试用账号；这个问题你查一下
 
 bug?
+促销价更新的时候不要发布商品，也不要修改商品的信息
+
 ![](https://static.dingtalk.com/media/lQLPKeZaZ2gBpNvNA3HNByawtJeocSbYnk0KXmo6fFCIAA_1830_881.png)
 ![[1787566557042_311fb68019572142d067fc0679b39645.png]]
 
