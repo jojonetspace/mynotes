@@ -6,7 +6,7 @@ Portal: [https://centralgroup-production.mirakl.net/login](https://centralgroup-
 User: kckittipongch@gmail.com
 
 Pass: iloveCOL183*
-
+![[Pasted image 20260904164507.png]]
 1
 ![[92fac10a2b327149b28a02512e685ce8.png]]
 2
