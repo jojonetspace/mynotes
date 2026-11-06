@@ -1,29 +1,33 @@
-舰长，49666568344
-shopee平台：366676850
+**限流：：：**
+下面把前面从 Shopee 官方 `v2.product.update_price` 接口文档(open.shopee.com)查到的限流相关错误码整理成表格。内容为合规做了转述。
 
-折扣活动不可修改结束时间和开启自动延续？？
+## Shopee 限流 / 调用量限制错误码
 
-商家：试用账号；这个问题你查一下
+|错误码|所属分类|含义|性质|系统是否自动重试|
+|---|---|---|---|---|
+|`error_rate_limit`|Common Error（网关层）|请求过于频繁，已触达频率上限，请稍后再试|短时频率限制（店铺级/App 级）|否（不在白名单）|
+|`error_limit`|Common Error（网关层）|当天 API 调用总量已达每日上限，需等到次日 00:00（UTC+8）后恢复|每日配额限制|否（不在白名单）|
 
-bug?
-促销价更新的时候不要发布商品，也不要修改商品的信息
+> 补充：Shopee 文档里还有 `error_too_many_request`（请求太多）这一类频率超限码,它在本系统的重试白名单 `RetriableErrorCodes` 里，命中后会走延迟重试、不终止任务。而上面两个 `error_rate_limit` / `error_limit` 目前不在白名单。
 
-![](https://static.dingtalk.com/media/lQLPKeZaZ2gBpNvNA3HNByawtJeocSbYnk0KXmo6fFCIAA_1830_881.png)
-![[1787566557042_311fb68019572142d067fc0679b39645.png]]
+## 对照：本次报错的 error_update_price_fail（证明不是限流）
 
-  
-折扣活动内没有搜索框，**没有折扣力度提醒**
-![[ead11f50f24652858c55606de1c2e268.png]]
-![[f847ddd885e7fa0bd7b96f1d0cb43b63.png]]
+|错误码|所属分类|含义|是否限流|
+|---|---|---|---|
+|`error_update_price_fail`|Business Error（业务层）|更新价格失败，请稍后再试（笼统兜底文案，真因在 `failure_list[].failed_reason`）|否|
 
-1)麻烦TK这里也和虾皮一样加一个选择折扣活动，然后加一列折扣价功能
-![[4c34fda9d4f5da18ee10e0b5b6c22b9f.png]]
+## 系统侧重试白名单（`ShopItemPlfService.cs` 的 `RetriableErrorCodes`）
 
-2)有促销也不影响我要新增sku吧，虾皮后台是可以新增sku的,不会加入促销，它只是在链接新增。
-![[565ce00fe938ed0edb2d27020ece5e96.png]]
+命中以下错误码才会被判为"临时性错误、可重试"，其余（含 `error_update_price_fail`）直接判 Fatal 终止：
 
-3)图文
-![[4a84b809e6bcabf45d19bd646c2d4ae4.png]]
-![[6b19e594f8894e268bc30832a828e032.png]]
-![[Pasted image 20260824143849.png]]
-{"error":"","message":"","warning":"","request_id":"e3e3e7f359c5318fc6a9cab9903d4500","response":{"item_list":[{"item_id":==49666568344==,"category_id":100890,"item_name":"โคมไฟ โคมไฟบำบัด โคมไฟบำบัดอินฟราเรด บรรเทาอาการปวดเมื่อยบริเวณคอ ไหล่ และเอว เหมาะสำหรับใช้ในบ้านและเสริมความงาม","item_sku":"","create_time":1787540235,"update_time":1787540238,"attribute_list":[{"attribute_id":100024,"original_attribute_name":"Application Area","attribute_value_list":[{"value_id":572,"original_value_name":"Body","value_unit":""}],"is_mandatory":false},{"attribute_id":100037,"original_attribute_name":"Region of Origin","attribute_value_list":[{"value_id":129,"original_value_name":"Thailand","value_unit":""}],"is_mandatory":false},{"attribute_id":100967,"original_attribute_name":"TIS No.","attribute_value_list":[{"value_id":0,"original_value_name":"1955-2551","value_unit":""}],"is_mandatory":false},{"attribute_id":101219,"original_attribute_name":"Custom Product","attribute_value_list":[{"value_id":7222,"original_value_name":"No","value_unit":""}],"is_mandatory":false}],"image":{"image_id_list":["th-11134207-81ztm-ms9a1pmj5tkxde","th-11134207-81ztk-ms9a1x8qse0w7d","th-11134207-81ztp-ms9a1xcd15oi52","th-11134207-81zto-ms9a1xaal24ldc","th-11134207-81zth-ms9a1x9kod1g17","th-11134207-81ztn-ms9ahqf8revad2","th-11134207-81ztj-ms9ahng1damec5","th-11134207-81ztq-ms9ahnfx8ef521","th-11134207-81zth-ms9ahng1damc7b"],"image_url_list":["https://cf.shopee.co.th/file/th-11134207-81ztm-ms9a1pmj5tkxde","https://cf.shopee.co.th/file/th-11134207-81ztk-ms9a1x8qse0w7d","https://cf.shopee.co.th/file/th-11134207-81ztp-ms9a1xcd15oi52","https://cf.shopee.co.th/file/th-11134207-81zto-ms9a1xaal24ldc","https://cf.shopee.co.th/file/th-11134207-81zth-ms9a1x9kod1g17","https://cf.shopee.co.th/file/th-11134207-81ztn-ms9ahqf8revad2","https://cf.shopee.co.th/file/th-11134207-81ztj-ms9ahng1damec5","https://cf.shopee.co.th/file/th-11134207-81ztq-ms9ahnfx8ef521","https://cf.shopee.co.th/file/th-11134207-81zth-ms9ahng1damc7b"],"image_ratio":"1:1"},"weight":"1.9","dimension":{"package_length":54,"package_width":33,"package_height":55},"logistic_info":[{"logistic_id":7001,"logistic_name":"Standard Delivery Bulky - ส่งสินค้าขนาดใหญ่","enabled":false,"size_id":0,"is_free":false,"estimated_shipping_fee":100},{"logistic_id":7000,"logistic_name":"Standard Delivery - ส่งธรรมดาในประเทศ","enabled":true,"size_id":0,"is_free":false,"estimated_shipping_fee":35},{"logistic_id":70036,"logistic_name":"Self Collection Point - จุดรับสินค้าด้วยตัวเอง","enabled":false,"size_id":0,"is_free":false,"estimated_shipping_fee":0}],"pre_order":{"is_pre_order":false,"days_to_ship":2},"condition":"NEW","size_chart":"","item_status":"NORMAL","has_model":true,"has_promotion":false,"video_info":[{"video_url":"https://cvf.shopee.co.th/file/api/v4/11110105/mms/th-11110105-6v8gp-ms9aglml0jk21b.16000041787539409.mp4","thumbnail_url":"https://cf.shopee.co.th/file/th-11110105-6v8gp-ms9aglml0jk21b_cover","duration":23}],"brand":{"brand_id":0,"original_brand_name":"NoBrand"},"item_dangerous":0,"description_info":{"extended_description":{"field_list":[{"field_type":"image","image_info":{"image_id":"th-11134208-81zth-ms9at6oxy3nqc1","image_url":"https://cf.shopee.co.th/file/th-11134208-81zth-ms9at6oxy3nqc1"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztm-ms9at6pa8kjp35","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztm-ms9at6pa8kjp35"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztd-ms9at6p07klh8a","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztd-ms9at6p07klh8a"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81zth-ms9at6pas8i0ff","image_url":"https://cf.shopee.co.th/file/th-11134208-81zth-ms9at6pas8i0ff"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztk-ms9at6qhz75se7","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztk-ms9at6qhz75se7"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81zti-ms9at6qy7jet57","image_url":"https://cf.shopee.co.th/file/th-11134208-81zti-ms9at6qy7jet57"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztn-ms9at6smexol6a","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztn-ms9at6smexol6a"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztk-ms9at6oxzi8691","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztk-ms9at6oxzi8691"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztn-ms9at6oy0wsm37","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztn-ms9at6oy0wsm37"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81zti-ms9at6oy2bd27b","image_url":"https://cf.shopee.co.th/file/th-11134208-81zti-ms9at6oy2bd27b"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztm-ms9at6oy3pxi76","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztm-ms9at6oy3pxi76"}},{"field_type":"image","image_info":{"image_id":"th-11134208-81ztj-ms9at6oy6j2edf","image_url":"https://cf.shopee.co.th/file/th-11134208-81ztj-ms9at6oy6j2edf"}}]}},"description_type":"extended","size_chart_id":0,"promotion_image":{"image_id_list":["th-11134207-81ztm-ms9a1pmj5tkxde"],"image_url_list":["https://cf.shopee.co.th/file/th-11134207-81ztm-ms9a1pmj5tkxde"]},"deboost":"FALSE","compatibility_info":{},"authorised_brand_id":0,"is_fulfillment_by_shopee":false,"tag":{"kit":false},"purchase_limit_info":{"min_purchase_limit":1}}]},"debug_message":""}
+|错误码|含义|
+|---|---|
+|`error_server`|平台服务端临时错误|
+|`error_too_many_request`|请求频率超限|
+|`error_system_busy`|平台系统繁忙|
+|`error_network`|网络超时|
+|`error_inner_timeout`|平台内部处理超时|
+
+一句话结论：真正的"限流"码是 `error_rate_limit` 和 `error_limit`（外加白名单里的 `error_too_many_request`）；你这次遇到的 `error_update_price_fail` 是业务错误，不是限流。
+
+需要的话我可以把这几张表整理成一个 Markdown 文档放到 `Doc/` 下，方便团队以后查。要不要？
