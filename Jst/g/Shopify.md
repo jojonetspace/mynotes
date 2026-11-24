@@ -5,6 +5,15 @@ Jst!QzPm@RFV123%
 5bc96e55e06e2a9bd824cf1ca2c1ed24
 77949bcb3ab721927afbba8b92da0829
 
+https://wujingtest-3xl0a5as.myshopify.com
+
+| 权限代码                           | 作用                                      |
+| ------------------------------ | --------------------------------------- |
+| `read_metaobjects`             | 读取元对象条目                                 |
+| `write_metaobjects`            | 创建、修改元对象条目（类目属性的值存在这里）                  |
+| `read_metaobject_definitions`  | 读取元对象定义                                 |
+| `write_metaobject_definitions` | 启用标准元对象定义（如颜色 `shopify--color-pattern`） |
+
 | [名称](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=name)                               | [类型](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=type) | [状态](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=status) | [组织](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=organization) | 套餐  | [上次访问时间](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=last_accessed) | 行动  |
 | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --- | --------------------------------------------------------------------------------------------- | --- |
 | [wujingtest](https://dev.shopify.com/dashboard/129472160/stores/73659482243)wujingtest-3xl0a5as.myshopify.com  | 开发                                                                               | —                                                                                  | 上海聚水潭网络科技有限公司                                                                            | —   | 2026年11月23日                                                                                   |     |
