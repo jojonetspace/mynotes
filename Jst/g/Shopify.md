@@ -14,6 +14,14 @@ https://wujingtest-3xl0a5as.myshopify.com
 | `read_metaobject_definitions`  | 读取元对象定义                                 |
 | `write_metaobject_definitions` | 启用标准元对象定义（如颜色 `shopify--color-pattern`） |
 
+| 系统里的叫法 | 存储字段                                     | Shopify 对应                                                                |
+| ------ | ---------------------------------------- | ------------------------------------------------------------------------- |
+| 商品属性   | `product_properties`（`PRODUCT_PROPERTY`） | 后台叫"类别元字段"（category metafields）。可选哪些属性由分类决定，所以其他平台也叫它类目属性。颜色、年龄组、适用性别都在这里 |
+| 销售属性   | `sales_properties`                       | 商品选项 `productOptions`，也就是变体维度                                             |
+| 其他属性   | `other_properties`                       | 产品元字段、系列等                                                                 |
+![[Pasted image 20261125094911.png]]
+
+
 | [名称](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=name)                               | [类型](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=type) | [状态](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=status) | [组织](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=organization) | 套餐  | [上次访问时间](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=last_accessed) | 行动  |
 | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --- | --------------------------------------------------------------------------------------------- | --- |
 | [wujingtest](https://dev.shopify.com/dashboard/129472160/stores/73659482243)wujingtest-3xl0a5as.myshopify.com  | 开发                                                                               | —                                                                                  | 上海聚水潭网络科技有限公司                                                                            | —   | 2026年11月23日                                                                                   |     |
