@@ -23,9 +23,9 @@ https://wujingtest-3xl0a5as.myshopify.com
 
 todo:
 1. 跨店复制和批量修改属性页。跨店复制时值是 A 店铺的条目 ID，到 B 店铺会写入失败。这个放到之后做复制和批量适配时一起处理。
-2. 还有截图中的已跟踪库存这个，我记得这个商品之前好像是不跟踪的，是不是我们发布后改为跟踪了？这个我不确定，你帮我看看
-3. 添加颜色弹窗界面优化
-4. 这个 100 是下载实现的限制，不是 Shopify 的限制。要支持超过 100 个变体的商品，得给下载加分页，把变体和图片取全。取全之后，才能去掉发布前的这道拦截。
+2. 添加原数据颜色弹窗界面优化
+3. 批量操作：`BatchOperate.cshtml` 和 `batch-stock-price.js` 里没有 Shopify 分支。多仓库存选择、刷新仓库、预售平台列表目前只认 Shopee、Lazada、TikTok，Shopify 多 location 店铺批量改库存可能走不通。这部分对应 `listing-batch-operations` skill。
+- 刊登列表页：列配置、搜索项、FixedFilter、按钮权限要按 `listing-index-page` skill 再核对一遍，目前只确认了 `Index.json` 里有 Shopify。
 
 
 | [名称](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=name)                               | [类型](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=type) | [状态](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=status) | [组织](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=organization) | 套餐  | [上次访问时间](https://dev.shopify.com/dashboard/129472160/stores?direction=asc&sort=last_accessed) | 行动  |
