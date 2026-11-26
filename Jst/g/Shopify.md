@@ -22,9 +22,12 @@ https://wujingtest-3xl0a5as.myshopify.com
 ![[Pasted image 20261125094911.png]]
 
 todo:
-1. 跨店复制和批量修改属性页。跨店复制时值是 A 店铺的条目 ID，到 B 店铺会写入失败。这个放到之后做复制和批量适配时一起处理。
-2. 添加原数据颜色弹窗界面优化
-3. 批量操作：`BatchOperate.cshtml` 和 `batch-stock-price.js` 里没有 Shopify 分支。多仓库存选择、刷新仓库、预售平台列表目前只认 Shopee、Lazada、TikTok，Shopify 多 location 店铺批量改库存可能走不通。这部分对应 `listing-batch-operations` skill。
+1. 厂商![[Pasted image 20261126134613.png|309]]
+2. 产品原数据：https://help.shopify.com/zh-CN/manual/custom-data/features![[Pasted image 20261126135149.png]]
+3. ![[Pasted image 20261126135158.png]]
+4. 跨店复制和批量修改属性页。跨店复制时值是 A 店铺的条目 ID，到 B 店铺会写入失败。这个放到之后做复制和批量适配时一起处理。
+5. 添加原数据颜色弹窗界面优化
+6. 批量操作：`BatchOperate.cshtml` 和 `batch-stock-price.js` 里没有 Shopify 分支。多仓库存选择、刷新仓库、预售平台列表目前只认 Shopee、Lazada、TikTok，Shopify 多 location 店铺批量改库存可能走不通。这部分对应 `listing-batch-operations` skill。
 - 刊登列表页：列配置、搜索项、FixedFilter、按钮权限要按 `listing-index-page` skill 再核对一遍，目前只确认了 `Index.json` 里有 Shopify。
 
 
