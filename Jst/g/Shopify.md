@@ -22,6 +22,7 @@ https://wujingtest-3xl0a5as.myshopify.com
 ![[Pasted image 20261125094911.png]]
 
 todo:
+![[Pasted image 20261126163448.png]]
 1. 厂商![[Pasted image 20261126134613.png|309]]
 2. 产品原数据：https://help.shopify.com/zh-CN/manual/custom-data/features![[Pasted image 20261126135149.png]]
 3. ![[Pasted image 20261126135158.png]]
