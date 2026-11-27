@@ -6,6 +6,7 @@ Jst!QzPm@RFV123%
 77949bcb3ab721927afbba8b92da0829
 
 https://wujingtest-3xl0a5as.myshopify.com
+https://admin.shopify.com/store/wujingtest-3xl0a5as/products
 
 | 权限代码                           | 作用                                      |
 | ------------------------------ | --------------------------------------- |
